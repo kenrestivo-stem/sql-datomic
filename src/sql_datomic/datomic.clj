@@ -35,7 +35,6 @@
   [path]
   (->> path
        jio/resource
-       jio/as-file
        slurp
        (edn/read-string {:readers *data-readers*})))
 

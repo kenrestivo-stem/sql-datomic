@@ -16,7 +16,6 @@
 (def parser
   (-> "sql-eensy.bnf"
       jio/resource
-      jio/as-file
       slurp
       (insta/parser
        :input-format :ebnf
@@ -314,3 +313,4 @@
            " in WHERE clauses.")
 
       :else nil)))
+
