@@ -4,6 +4,7 @@
             [com.stuartsierra.component :as component]
             [clojure.pprint :as pp]
             [clojure.walk :as walk]
+            [clojure.java.io :as jio]
             [sql-datomic.util :as util :refer [get-entities-by-eids]])
   (:import [datomic.impl Exceptions$IllegalArgumentExceptionInfo]))
 
@@ -30,17 +31,21 @@
 
 (declare datomicify-clause)
 
+(defn load-edn
+  [path]
+  (->> path
+       jio/resource
+       jio/as-file
+       slurp
+       (edn/read-string {:readers *data-readers*})))
+
 (defn -create-dellstore-db []
   (d/create-database default-connection-uri)
   (let [connection (d/connect default-connection-uri)
-        load-edn (fn [path]
-                   (->> path
-                        slurp
-                        (edn/read-string {:readers *data-readers*})))
-        schema-tx (load-edn "resources/dellstore-schema.edn")
-        customers-tx (load-edn "resources/dellstore-customers-data.edn")
-        products-tx (load-edn "resources/dellstore-products-data.edn")
-        orders-tx (load-edn "resources/dellstore-orders-data.edn")]
+        schema-tx (load-edn "dellstore-schema.edn")
+        customers-tx (load-edn "dellstore-customers-data.edn")
+        products-tx (load-edn "dellstore-products-data.edn")
+        orders-tx (load-edn "dellstore-orders-data.edn")]
     @(d/transact connection schema-tx)
     ;; Order here matters.
     @(d/transact connection customers-tx)
@@ -51,12 +56,8 @@
 (defn -create-starfighter-db []
   (d/create-database default-connection-uri)
   (let [connection (d/connect default-connection-uri)
-        load-edn (fn [path]
-                   (->> path
-                        slurp
-                        (edn/read-string {:readers *data-readers*})))
-        schema-tx (load-edn "resources/starfighter-schema.edn")
-        data-tx (load-edn "resources/starfighter-data.edn")]
+        schema-tx (load-edn "starfighter-schema.edn")
+        data-tx (load-edn "starfighter-data.edn")]
     @(d/transact connection schema-tx)
     @(d/transact connection data-tx)
     connection))
@@ -64,13 +65,9 @@
 (defn -create-seattle-db []
   (d/create-database default-connection-uri)
   (let [connection (d/connect default-connection-uri)
-        load-edn (fn [path]
-                   (->> path
-                        slurp
-                        (edn/read-string {:readers *data-readers*})))
-        schema-tx (load-edn "resources/seattle-schema.edn")
-        data0-tx (load-edn "resources/seattle-data0.edn")
-        data1-tx (load-edn "resources/seattle-data1.edn")]
+        schema-tx (load-edn "seattle-schema.edn")
+        data0-tx (load-edn "seattle-data0.edn")
+        data1-tx (load-edn "seattle-data1.edn")]
     @(d/transact connection schema-tx)
     @(d/transact connection data0-tx)
     @(d/transact connection data1-tx)
@@ -716,3 +713,5 @@
   ;; `or-join` also works but seems to be unnecessary.
 
   )
+
+

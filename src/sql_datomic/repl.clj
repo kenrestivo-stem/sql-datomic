@@ -15,7 +15,7 @@
             [clojure.set :as set]
             [sql-datomic.tabula :as tab]
             [sql-datomic.schema :as sch])
-  ;; (:gen-class)
+   (:gen-class)
   )
 
 (def ^:dynamic *prompt* "sql> ")

@@ -7,13 +7,16 @@
             [clj-time.format :as fmt]
             [clj-time.core :as tm]
             [clj-time.coerce :as coer]
+            [clojure.java.io :as jio]
             [clojure.instant :as inst]
             [sql-datomic.types :as types]
             [sql-datomic.util :as util]
             [clojure.walk :as walk]))
 
 (def parser
-  (-> "resources/sql-eensy.bnf"
+  (-> "sql-eensy.bnf"
+      jio/resource
+      jio/as-file
       slurp
       (insta/parser
        :input-format :ebnf
@@ -82,7 +85,7 @@
   (let [s' (if (->> s last #{\F \f})
              (subs s 0 (-> s count dec))
              s)]
-   (Float/parseFloat s')))
+    (Float/parseFloat s')))
 
 (defn reducible-or-tree [& vs]
   (case (count vs)
